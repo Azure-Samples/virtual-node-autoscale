@@ -1,0 +1,72 @@
+# Default values for adoptdog.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+
+app:
+  throttle:
+    sleep: 1
+    limit: 100
+
+  replicaCount: 1
+  image:
+    repository: jeremyrickard/rps-prom
+    tag: latest
+    pullPolicy: Always
+  
+  service:
+    type: ClusterIP
+    port: 80
+  
+  ingress:
+    enabled: true
+    # Used to create an Ingress record.
+    # When use IP access, comment hosts node
+    host: adoptrps.13.78.134.10.nip.io
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      #kubernetes.io/tls-acme: "true"
+      #nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    #tls:
+      # Secrets must be manually created in the namespace.
+      #- secretName: mi-rbitia-com
+      #  hosts:
+      #    - mi.rbitia.com
+  resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+   #limits:
+   # cpu: 100m
+   # memory: 0.1G
+    requests:
+      cpu: 500m
+      memory: 0.1G
+
+  nodeSelector: {}
+
+  tolerations:
+    - key: virtual-kubelet.io/provider
+      operator: Exists
+    - key: azure.com/aci
+      effect: NoSchedule
+
+  affinity: {}
+
+promMonitor: rps-demo
+
+counter:
+  replicaCount: 1
+  # The watcher will report pods on this node separately
+  specialNodeName: 
+  image:
+    repository: jeremyrickard/container-counter
+    tag: latest 
+    pullPolicy: Always 
+
+hpa:
+  metricTarget: 10
+  minReplicas: 2 
+  maxReplicas: 10
