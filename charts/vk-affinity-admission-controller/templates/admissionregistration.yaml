@@ -1,0 +1,60 @@
+{{- $ca := genCA "admission-controller-ca" 3650 }}
+{{- $cn := printf "%s-%s" .Release.Name .Chart.Name }}
+{{- $altName1 := printf "%s-%s.%s" .Release.Name .Chart.Name .Release.Namespace }}
+{{- $altName2 := printf "%s-%s.%s.svc" .Release.Name .Chart.Name .Release.Namespace }}
+{{- $cert := genSignedCert $cn nil (list $altName1 $altName2) 3650 $ca }}
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: {{ .Values.admissionRegistration.kind }}
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    app: {{ template "fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+webhooks:
+- clientConfig:
+    caBundle: {{ b64enc $ca.Cert }}
+    service:
+      name: {{ template "fullname" . }}
+      namespace: {{ .Release.Namespace }}
+      path: /inject
+  failurePolicy: {{ .Values.admissionRegistration.failurePolicy }}
+  namespaceSelector:
+{{- if .Values.admissionRegistration.enableNamespacesByDefault }}
+    matchExpressions:
+    - key: vk-affinity-injection
+      operator: NotIn
+      values:
+      - disabled
+{{- else }}
+    matchLabels:
+      vk-affinity-injection: enabled
+{{- end }}
+  name: {{ template "fullname" . }}.k8s.io
+  rules:
+  - apiGroups:
+    - ""
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    resources:
+    - pods
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ template "fullname" . }}-cert
+  labels:
+    app: {{ template "fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+type: Opaque
+data:
+  tls.crt: {{ b64enc $cert.Cert }}
+  tls.key: {{ b64enc $cert.Key }}
+  {{- if .Values.controller.tls.requestHeaderCA }}
+  requestheader-ca.crt: {{ .Values.controller.tls.requestHeaderCA }}
+  {{- end }}

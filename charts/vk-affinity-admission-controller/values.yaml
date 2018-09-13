@@ -1,0 +1,26 @@
+# Default values for InternalLB Webhook Admission Controller
+rbac:
+  create: true
+
+admissionRegistration:
+  # valid values are "ValidatingWebhookConfiguration", and "MutatingWebhookConfiguration"
+  kind: MutatingWebhookConfiguration
+  # valid values are "Ignore" and "Fail"
+  failurePolicy: Ignore
+  # enableNamespacesByDefault: true
+controller:
+  image: lachlanevenson/vk-affinity-admission-controller
+  imageTag: canary
+  imagePullPolicy: Always
+  serviceAccount: vk-affinity-admission-controller
+  tls:
+    # Admission controller server will inherit this CA from the
+    # extension-apiserver-authentication ConfigMap if available.
+    requestHeaderCA:
+  service:
+    # Type of service; valid values are "LoadBalancer" and "NodePort"
+    # NodePort is useful if deploying on bare metal or hacking locally on
+    # minikube
+    type: NodePort
+    port: 443
+    targetPort: 8443

@@ -1,0 +1,25 @@
+{{ if .Values.rbac.create }}
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ template "fullname" . }}-role
+rules:
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames: ["extension-apiserver-authentication"]
+  verbs: ["get", "list", "watch"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ template "fullname" . }}-role-binding
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.controller.serviceAccount }}
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: {{ template "fullname" . }}-role
+  apiGroup: rbac.authorization.k8s.io
+  namespace: {{ .Release.Namespace }}
+{{- end -}}
