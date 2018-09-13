@@ -1,0 +1,55 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    app: {{ template "fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        release: "{{ .Release.Name }}"
+        releaseRevision: "{{ .Release.Revision }}"
+        heritage: "{{ .Release.Service }}"
+    spec:
+      serviceAccountName: "{{ .Values.controller.serviceAccount }}"
+      containers:
+      - name: webhook
+        image: {{ .Values.controller.image }}:{{ .Values.controller.imageTag }}
+        imagePullPolicy: {{ .Values.controller.imagePullPolicy }}
+        command: ["/vk-affinity-admission-controller"]
+        args:
+        - --logtostderr
+        - -v=4
+        - 2>&1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 20Mi
+          limits:
+            cpu: 100m
+            memory: 30Mi
+        livenessProbe:
+          httpGet:
+            scheme: HTTPS
+            path: /healthz
+            port: {{ .Values.controller.service.targetPort }}
+        ports:
+        - containerPort: {{ .Values.controller.service.targetPort }}
+        volumeMounts:
+        - name: certs
+          mountPath: /var/run/vk-affinity-admission-controller
+          readOnly: true
+      volumes:
+      - name: certs
+        secret:
+          secretName: {{ template "fullname" . }}-cert
