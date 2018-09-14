@@ -1,0 +1,14 @@
+serviceAccount:
+  name: grafana
+
+adminPassword: adoptdog
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      url: http://prometheus-prometheus-0:9090
+      access: proxy
+      isDefault: true
