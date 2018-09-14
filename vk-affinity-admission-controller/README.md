@@ -68,7 +68,7 @@ MutatingAdmissionWebhook
 ```
 
 ```
-helm install --name admission-webhook charts/vk-admission-admission-controller --vk-affinity
+helm install --name admission-webhook charts/vk-admission-admission-controller --namespace vk-affinity
 ```
 
 ```
