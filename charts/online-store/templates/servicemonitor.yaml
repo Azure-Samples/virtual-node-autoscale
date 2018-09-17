@@ -1,13 +1,13 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name:  {{ template "adoptdog.fullname" . }} 
+  name:  {{ template "online-store.fullname" . }} 
   labels:
     team: {{ .Values.promMonitor }}
-    app: {{ template "adoptdog.name" . }} 
+    app: {{ template "online-store.name" . }} 
 spec:
   selector:
     matchLabels:
-      prom: {{ template "adoptdog.name" . }}
+      prom: {{ template "online-store.name" . }}
   endpoints:
   - port: http

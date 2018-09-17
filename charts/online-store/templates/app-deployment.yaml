@@ -1,22 +1,22 @@
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: {{ template "adoptdog.fullname" . }}
+  name: {{ template "online-store.fullname" . }}
   labels:
-    app: {{ template "adoptdog.name" . }}
-    chart: {{ template "adoptdog.chart" . }}
+    app: {{ template "online-store.name" . }}
+    chart: {{ template "online-store.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.app.replicaCount }}
   selector:
     matchLabels:
-      app: {{ template "adoptdog.name" . }}
+      app: {{ template "online-store.name" . }}
       release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ template "adoptdog.name" . }}
+        app: {{ template "online-store.name" . }}
         release: {{ .Release.Name }}
     spec:
       containers:

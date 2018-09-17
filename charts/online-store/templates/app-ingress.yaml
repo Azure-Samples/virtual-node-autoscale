@@ -1,13 +1,13 @@
 {{- if .Values.app.ingress.enabled -}}
-{{- $fullName := include "adoptdog.fullname" . -}}
+{{- $fullName := include "online-store.fullname" . -}}
 {{- $ingressPath := .Values.app.ingress.path -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
-    app: {{ template "adoptdog.name" . }}
-    chart: {{ template "adoptdog.chart" . }}
+    app: {{ template "online-store.name" . }}
+    chart: {{ template "online-store.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 {{- with .Values.app.ingress.annotations }}

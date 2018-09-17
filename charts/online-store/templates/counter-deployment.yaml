@@ -1,9 +1,9 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{ template "adoptdog.fullname" . }}-counter
+  name: {{ template "online-store.fullname" . }}-counter
   labels:
-    app: {{ template "adoptdog.name" . }}-counter
+    app: {{ template "online-store.name" . }}-counter
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -12,10 +12,10 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ template "adoptdog.name" . }}-counter
+        app: {{ template "online-store.name" . }}-counter
         release: {{ .Release.Name }}
     spec:
-      serviceAccountName: {{ template "adoptdog.fullname" . }}
+      serviceAccountName: {{ template "online-store.fullname" . }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.counter.image.repository }}:{{ .Values.counter.image.tag }}"
@@ -36,6 +36,6 @@ spec:
             - name: NAMESPACE
               value: {{ .Release.Namespace }}
             - name: LABEL_SELECTOR
-              value: "app={{ template "adoptdog.name" . }}"
+              value: "app={{ template "online-store.name" . }}"
             - name: SPECIAL_NODE_NAME
               value: {{ required "A value is required for counter.specialNodeName" .Values.counter.specialNodeName}}
