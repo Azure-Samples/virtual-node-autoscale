@@ -1,16 +1,16 @@
-# Virtual-Node Autoscale Demo
+# Virutal node Autoscale Demo
 
-This repository contains a demo that shows how to use custom metrics in combinations with Kubernetes Horizontal Pod Autoscaler to autoscale an application. Virtual-nodes let you scale quickly and easily to Azure Container Instances where you'll pay only for the container instance runtime. This repository will guide you through first installing the Virtual-node admission controller, follow by the Prometheus Operator, then create a Prometheus instance and installing the Prometheus Metric Adapter. With these in place, the provided Helm chart will install our demo application, along with supporting monitoring components, like a **ServiceMonitor** for Prometheus, a Horizontal Pod Autoscaler, and a custom container that will count the instances of the application and expose them to Prometheus. Finally, an optiona Grafana dashboard can be installed to view the metrics in real-time.
+This repository demonstrates how to use custom metrics in combination with the Kubernetes Horizontal Pod Autoscaler to autoscale an application. Virtual nodes let you scale quickly and easily run Kubernetes pods on Azure Container Instances where you'll pay only for the container instance runtime. This repository will guide you through first installing the virtual node admission controller, followed by the Prometheus Operator. Then create a Prometheus instance and install the Prometheus Metric Adapter. With these in place, the provided Helm chart will install our demo application, along with supporting monitoring components, like a **ServiceMonitor** for Prometheus, a Horizontal Pod Autoscaler, and a custom container that will count the instances of the application and expose them to Prometheus. Finally, an optional Grafana dashboard can be installed to view the metrics in real-time.
 
 ## Prerequisites
-* Virtual-node enabled AKS cluster running Kubernetes version 1.10 or later
+* Virtual node enabled AKS cluster running Kubernetes version 1.10 or later
 * Advanced Networking
 * MutatingAdmissionWebhook admission controller activated - (https://kubernetes.io/docs/admin/extensible-admission-controllers/#external-admission-webhooks).
-* Running ingress controller
+* Running Ingress controller (nginx or similar)
 
-## Install Virtual-node admission-controller (OPTIONAL)
+## Install Virtual node admission-controller (OPTIONAL)
 
-In order to control the Kubernetes scheduler to "favor" VM backed Kubernetes nodes BEFORE scaling out to the Virtual-node we can use a Kubernetes Webhook Admission Controller which adds pod affinity and toleration key/values to all pods in a correctly labeled namespace. 
+In order to control the Kubernetes scheduler to "favor" VM backed Kubernetes nodes BEFORE scaling out to the virtual node we can use a Kubernetes Webhook Admission Controller to add pod affinity and toleration key/values to all pods in a correctly labeled namespace. 
 
 ### Pod patches
 
@@ -45,12 +45,12 @@ spec:
 ### Install
 
 ```
-helm install --name admission-webhook charts/vk-admission-admission-controller --namespace vk-affinity
+helm install --name admission-webhook charts/vn-affinity-admission-controller --namespace vn-affinity
 ```
 
 Label the namespace you wish enable the webhook to function on
 ```
-kubectl label namespace default vk-affinity-injection=enabled
+kubectl label namespace default vn-affinity-injection=enabled
 ```
 
 ## Install Prometheus Operator
@@ -94,11 +94,11 @@ In this case, it's Virtual Kubelet. If you've installed with the ACI Connector, 
 Export the node name to an environment variable
 
 ```base
-$ export VK_NODE_NAME=<your_node_name>
+export VK_NODE_NAME=<your_node_name>
 ```
 
 ```bash
-$ helm install ./charts/adoptdog --name rps-prom --set counter.specialNodeName=$VK_NODE_NAME
+helm install ./charts/adoptdog --name rps-prom --set counter.specialNodeName=$VK_NODE_NAME
 ```
 
 This will deploy with an ingress and should create the HPA, Prometheus ServiceMonitor and everything else needed, except the adapter. Do that next.
@@ -156,7 +156,7 @@ $ kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1/namespaces/default/pod/*
 }
 ```
 
-## Deploy the Grafana Dashboard (optional)
+## Deploy the Grafana Dashboard (OPTIONAL)
 
 This optional step installs a Grafana dashboard to view measured metrics in real-time.
 
