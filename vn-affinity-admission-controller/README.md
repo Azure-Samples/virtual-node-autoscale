@@ -1,4 +1,4 @@
-# Kubernetes Virtual Kubelet Admission Webhook
+# Kubernetes Virtual node Admission Webhook
 
 This Kubernetes Admission adds pod affinity and toleration key/values to all pods in a correctly labeled namespace
 
@@ -68,11 +68,11 @@ MutatingAdmissionWebhook
 ```
 
 ```
-helm install --name admission-webhook charts/vk-admission-admission-controller --namespace vk-affinity
+helm install --name admission-webhook charts/vn-affinity-admission-controller --namespace vn-affinity
 ```
 
 ```
-helm inspect charts/vk-admission-admission-controller
+helm inspect charts/vn-affinity-admission-controller
 ```
 
 Label the namespace you wish enable the webhook to function on

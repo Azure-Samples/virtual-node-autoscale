@@ -23,13 +23,13 @@ webhooks:
   namespaceSelector:
 {{- if .Values.admissionRegistration.enableNamespacesByDefault }}
     matchExpressions:
-    - key: vk-affinity-injection
+    - key: vn-affinity-injection
       operator: NotIn
       values:
       - disabled
 {{- else }}
     matchLabels:
-      vk-affinity-injection: enabled
+      vn-affinity-injection: enabled
 {{- end }}
   name: {{ template "fullname" . }}.k8s.io
   rules:
