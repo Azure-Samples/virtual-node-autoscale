@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "online-store.fullname" . }}-counter
+  labels:
+    app: {{ template "online-store.name" . }}-counter
+    prom: {{ template "online-store.name" . }}
+    chart: {{ template "online-store.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.app.service.type }}
+  ports:
+    - port: {{ .Values.app.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ template "online-store.name" . }}-counter
+    release: {{ .Release.Name }}
