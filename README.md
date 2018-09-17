@@ -45,7 +45,7 @@ spec:
 ### Install
 
 ```
-helm install --name admission-webhook charts/vn-affinity-admission-controller --namespace vn-affinity
+helm install --name vn-affinity charts/vn-affinity-admission-controller --namespace vn-affinity
 ```
 
 Label the namespace you wish enable the webhook to function on
@@ -95,10 +95,11 @@ Export the node name to an environment variable
 
 ```base
 export VK_NODE_NAME=<your_node_name>
+export INGRESS_EXTERNAL_IP=<ingress_external_ip>
 ```
 
 ```bash
-helm install ./charts/adoptdog --name rps-prom --set counter.specialNodeName=$VK_NODE_NAME
+helm install ./charts/adoptdog --name rps-prom --set counter.specialNodeName=$VK_NODE_NAME,app.ingress.host=store.$INGRESS_EXTERNAL_IP.nip.io
 ```
 
 This will deploy with an ingress and should create the HPA, Prometheus ServiceMonitor and everything else needed, except the adapter. Do that next.
@@ -164,8 +165,14 @@ This optional step installs a Grafana dashboard to view measured metrics in real
 helm install stable/grafana --name grafana -f grafana/values.yaml
 ```
 
+Retreive admin user password for UI access
 ```bash
-export POD_NAME=$(kubectl get pods --namespace default -l "app=grafana,component=" -o jsonpath="{.items[0].metadata.name}")
+kubectl get secret --namespace default grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+```
+
+Use kubectl to create a port-forward to the grafana pod
+```bash
+export POD_NAME=$(kubectl get pods --namespace default -l "app=grafana" -o jsonpath="{.items[0].metadata.name}")
 kubectl --namespace default port-forward $POD_NAME 3000
 ```
 

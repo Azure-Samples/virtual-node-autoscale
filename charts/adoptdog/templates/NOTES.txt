@@ -1,8 +1,6 @@
 1. Get the application URL by running these commands:
 {{- if .Values.app.ingress.enabled }}
-{{- range .Values.app.ingress.hosts }}
-  Connect to the app via ingress at: http{{ if $.Values.app.ingress.tls }}s{{ end }}://{{ . }}{{ $.Values.app.ingress.path }}
-{{- end }}
+  Connect to the app via ingress at: http{{ if $.Values.app.ingress.tls }}s{{ end }}://{{ $.Values.app.ingress.host }}
 {{- else if contains "NodePort" .Values.app.service.type }}
   export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "adoptdog.fullname" . }})
   export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
