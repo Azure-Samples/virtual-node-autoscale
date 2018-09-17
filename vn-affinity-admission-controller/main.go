@@ -127,7 +127,7 @@ func main() {
 	certKey := certKey{}
 	flag.StringVar(&Options.PortNumber, "port", "8443", "webserver port")
 	flag.StringVar(&certKey.PairName, "keypairname", "tls", "certificate and key pair name")
-	flag.StringVar(&certKey.CertDirectory, "certdir", "/var/run/vk-affinity-admission-controller", "certificate and key directory")
+	flag.StringVar(&certKey.CertDirectory, "certdir", "/var/run/vn-affinity-admission-controller", "certificate and key directory")
 	flag.StringVar(&Options.PodAffinityKey, "podaffinitykey", "type", "node label key to match")
 	flag.StringVar(&Options.PodAffinityValue, "podaffinityvalue", "virtual-kubelet", "node label value to match")
 	flag.Parse()

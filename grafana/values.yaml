@@ -1,8 +1,6 @@
 serviceAccount:
   name: grafana
 
-adminPassword: adoptdog
-
 datasources:
   datasources.yaml:
     apiVersion: 1
@@ -12,3 +10,28 @@ datasources:
       url: http://prometheus-prometheus-0:9090
       access: proxy
       isDefault: true
+
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+    - name: 'default'
+      orgId: 1
+      folder: ''
+      type: file
+      disableDeletion: false
+      editable: true
+      options:
+        path: /var/lib/grafana/dashboards/default
+
+dashboards:
+  default:
+    some-dashboard:
+      json: |
+        {"__requires":[{"type":"grafana","id":"grafana","name":"Grafana","version":"5.2.3"},{"type":"panel","id":"graph","name":"Graph","version":"5.0.0"},{"type":"datasource","id":"prometheus","name":"Prometheus","version":"5.0.0"},{"type":"panel","id":"singlestat","name":"Singlestat","version":"5.0.0"}],"annotations":{"list":[{"builtIn":1,"datasource":"-- Grafana --","enable":true,"hide":true,"iconColor":"rgba(0, 211, 255, 1)","name":"Annotations & Alerts","type":"dashboard"}]},"editable":true,"gnetId":null,"graphTooltip":0,"id":null,"links":[],"panels":[{"aliasColors":{},"bars":false,"dashLength":10,"dashes":false,"datasource":"Prometheus","fill":1,"gridPos":{"h":9,"w":12,"x":0,"y":0},"id":4,"legend":{"avg":false,"current":false,"max":false,"min":false,"show":true,"total":false,"values":false},"lines":true,"linewidth":1,"links":[],"nullPointMode":"null","percentage":false,"pointradius":5,"points":false,"renderer":"flot","seriesOverrides":[],"spaceLength":10,"stack":false,"steppedLine":false,"targets":[{"expr":"round(sum(irate(request_durations_histogram_secs_count{namespace!=\"\", pod!=\"\"}[1m])))","format":"time_series","interval":"","intervalFactor":1,"legendFormat":"requests per second","refId":"A"}],"thresholds":[],"timeFrom":null,"timeShift":null,"title":"RPS","tooltip":{"shared":true,"sort":0,"value_type":"individual"},"type":"graph","xaxis":{"buckets":null,"mode":"time","name":null,"show":true,"values":[]},"yaxes":[{"format":"short","label":null,"logBase":1,"max":null,"min":null,"show":true},{"format":"short","label":null,"logBase":1,"max":null,"min":null,"show":true}],"yaxis":{"align":false,"alignLevel":null}},{"aliasColors":{},"bars":false,"dashLength":10,"dashes":false,"datasource":"Prometheus","fill":1,"gridPos":{"h":9,"w":12,"x":12,"y":0},"id":2,"legend":{"avg":false,"current":false,"max":false,"min":false,"show":true,"total":false,"values":false},"lines":true,"linewidth":1,"links":[],"nullPointMode":"null","percentage":false,"pointradius":5,"points":false,"renderer":"flot","seriesOverrides":[],"spaceLength":10,"stack":false,"steppedLine":false,"targets":[{"expr":"round(irate(request_durations_histogram_secs_count{namespace!=\"\", pod!=\"\"}[1m]))","format":"time_series","intervalFactor":1,"legendFormat":"","refId":"A"}],"thresholds":[],"timeFrom":null,"timeShift":null,"title":"RPS Per Pod","tooltip":{"shared":true,"sort":0,"value_type":"individual"},"type":"graph","xaxis":{"buckets":null,"mode":"time","name":null,"show":true,"values":[]},"yaxes":[{"format":"short","label":null,"logBase":1,"max":null,"min":null,"show":true},{"format":"short","label":null,"logBase":1,"max":null,"min":null,"show":true}],"yaxis":{"align":false,"alignLevel":null}},{"aliasColors":{},"bars":false,"dashLength":10,"dashes":false,"datasource":"Prometheus","fill":1,"gridPos":{"h":9,"w":12,"x":0,"y":9},"id":6,"legend":{"avg":false,"current":false,"max":false,"min":false,"show":true,"total":false,"values":false},"lines":true,"linewidth":1,"links":[],"nullPointMode":"null","percentage":false,"pointradius":5,"points":false,"renderer":"flot","seriesOverrides":[],"spaceLength":10,"stack":false,"steppedLine":false,"targets":[{"expr":"avg(request_durations_histogram_secs_sum / request_durations_histogram_secs_count)","format":"time_series","hide":false,"intervalFactor":1,"legendFormat":"response time","refId":"A"}],"thresholds":[],"timeFrom":null,"timeShift":null,"title":"Response Time","tooltip":{"shared":true,"sort":0,"value_type":"individual"},"type":"graph","xaxis":{"buckets":null,"mode":"time","name":null,"show":true,"values":[]},"yaxes":[{"format":"s","label":null,"logBase":1,"max":null,"min":null,"show":true},{"format":"short","label":null,"logBase":1,"max":null,"min":null,"show":true}],"yaxis":{"align":false,"alignLevel":null}},{"cacheTimeout":null,"colorBackground":false,"colorValue":false,"colors":["#299c46","rgba(237, 129, 40, 0.89)","#d44a3a"],"datasource":"Prometheus","format":"none","gauge":{"maxValue":100,"minValue":0,"show":false,"thresholdLabels":false,"thresholdMarkers":true},"gridPos":{"h":9,"w":6,"x":12,"y":9},"id":10,"interval":null,"links":[],"mappingType":1,"mappingTypes":[{"name":"value to text","value":1},{"name":"range to text","value":2}],"maxDataPoints":100,"nullPointMode":"connected","nullText":null,"postfix":"","postfixFontSize":"50%","prefix":"","prefixFontSize":"50%","rangeMaps":[{"from":"null","text":"N/A","to":"null"}],"sparkline":{"fillColor":"rgba(31, 118, 189, 0.18)","full":false,"lineColor":"rgb(31, 120, 193)","show":true},"tableColumn":"","targets":[{"expr":"max(running_containers_nodes)","format":"time_series","intervalFactor":1,"refId":"A"}],"thresholds":"","title":"Running Pods (VM)","type":"singlestat","valueFontSize":"80%","valueMaps":[{"op":"=","text":"N/A","value":"null"}],"valueName":"current"},{"cacheTimeout":null,"colorBackground":false,"colorValue":false,"colors":["#299c46","rgba(237, 129, 40, 0.89)","#d44a3a"],"datasource":"Prometheus","format":"none","gauge":{"maxValue":100,"minValue":0,"show":false,"thresholdLabels":false,"thresholdMarkers":true},"gridPos":{"h":9,"w":6,"x":18,"y":9},"id":12,"interval":null,"links":[],"mappingType":1,"mappingTypes":[{"name":"value to text","value":1},{"name":"range to text","value":2}],"maxDataPoints":100,"nullPointMode":"connected","nullText":null,"postfix":"","postfixFontSize":"50%","prefix":"","prefixFontSize":"50%","rangeMaps":[{"from":"null","text":"N/A","to":"null"}],"sparkline":{"fillColor":"rgba(31, 118, 189, 0.18)","full":false,"lineColor":"rgb(31, 120, 193)","show":true},"tableColumn":"","targets":[{"expr":"max(running_containers_vk)","format":"time_series","hide":false,"intervalFactor":1,"refId":"A"}],"thresholds":"","title":"Running Pods (ACI)","type":"singlestat","valueFontSize":"80%","valueMaps":[{"op":"=","text":"N/A","value":"null"}],"valueName":"current"}],"refresh":"30s","schemaVersion":16,"style":"dark","tags":[],"templating":{"list":[]},"time":{"from":"now-15m","to":"now"},"timepicker":{"refresh_intervals":["5s","10s","30s","1m","5m","15m","30m","1h","2h","1d"],"time_options":["5m","15m","1h","6h","12h","24h","2d","7d","30d"]},"timezone":"","title":"RPS Demo","uid":"24mIMU2ik","version":2}
+    prometheus-stats:
+      gnetId: 2
+      revision: 2
+      datasource: Prometheus
+    local-dashboard:
+      url: https://example.com/repository/test.json

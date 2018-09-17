@@ -1,4 +1,4 @@
-DOCKER_IMAGE ?= lachlanevenson/vk-affinity-admission-controller
+DOCKER_IMAGE ?= lachlanevenson/vn-affinity-admission-controller
 GIT_BRANCH ?= `git rev-parse --abbrev-ref HEAD`
 
 ifeq ($(GIT_BRANCH), master)
