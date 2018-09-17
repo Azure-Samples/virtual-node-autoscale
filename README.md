@@ -77,7 +77,7 @@ This will create a single replica Prometheus instance.
 kubectl expose pod prometheus-prometheus-0 --port 9090 --target-port 9090
 ```
 
-## Deploy The Adopt Dog App
+## Deploy online-store app
 
 You will need your Virtual Kubelet node name to install the app. The app will install a counter that will get the pod count for the application and provide a metric for pods on Virtual Kubelet and pods on all other nodes.
 
@@ -99,7 +99,7 @@ export INGRESS_EXTERNAL_IP=<ingress_external_ip>
 ```
 
 ```bash
-helm install ./charts/adoptdog --name rps-prom --set counter.specialNodeName=$VK_NODE_NAME,app.ingress.host=store.$INGRESS_EXTERNAL_IP.nip.io
+helm install ./charts/online-store --name online-store --set counter.specialNodeName=$VK_NODE_NAME,app.ingress.host=store.$INGRESS_EXTERNAL_IP.nip.io
 ```
 
 This will deploy with an ingress and should create the HPA, Prometheus ServiceMonitor and everything else needed, except the adapter. Do that next.
@@ -135,7 +135,7 @@ $ kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1/namespaces/default/pod/*
       "describedObject": {
         "kind": "Pod",
         "namespace": "default",
-        "name": "rps-prom-adoptdog-8684976576-7hvc9",
+        "name": "online-store-8684976576-7hvc9",
         "apiVersion": "/__internal"
       },
       "metricName": "requests_per_second",
@@ -146,7 +146,7 @@ $ kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1/namespaces/default/pod/*
       "describedObject": {
         "kind": "Pod",
         "namespace": "default",
-        "name": "rps-prom-adoptdog-8684976576-p6wm7",
+        "name": "online-store-8684976576-p6wm7",
         "apiVersion": "/__internal"
       },
       "metricName": "requests_per_second",
@@ -192,14 +192,14 @@ hey -z 20m http://<whatever-the-ingress-url-is>
 ## Watch it scale
 
 ```
-$ kubectl get hpa rps-prom-adoptdog -w
+$ kubectl get hpa online-store -w
 NAME                REFERENCE                      TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
-rps-prom-adoptdog   Deployment/rps-prom-adoptdog   0 / 10    2         10        2          4m
-rps-prom-adoptdog   Deployment/rps-prom-adoptdog   128500m / 10   2         10        2         4m
-rps-prom-adoptdog   Deployment/rps-prom-adoptdog   170500m / 10   2         10        4         5m
-rps-prom-adoptdog   Deployment/rps-prom-adoptdog   111500m / 10   2         10        4         5m
-rps-prom-adoptdog   Deployment/rps-prom-adoptdog   95250m / 10   2         10        4         6m
-rps-prom-adoptdog   Deployment/rps-prom-adoptdog   141 / 10   2         10        4         6m
+online-store   Deployment/online-store   0 / 10    2         10        2          4m
+online-store   Deployment/online-store   128500m / 10   2         10        2         4m
+online-store   Deployment/online-store   170500m / 10   2         10        4         5m
+online-store   Deployment/online-store   111500m / 10   2         10        4         5m
+online-store   Deployment/online-store   95250m / 10   2         10        4         6m
+online-store   Deployment/online-store   141 / 10   2         10        4         6m
 ```
 
 Overtime, this should go up.
