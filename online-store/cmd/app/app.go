@@ -12,14 +12,12 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-)
 
-// type metrics struct {
-// 	currentCount int
-// 	lastCount    int
-// 	rps          float64
-// 	lastTime     time.Time
-// }
+	"contrib.go.opencensus.io/exporter/ocagent"
+	"go.opencensus.io/plugin/ochttp"
+	"go.opencensus.io/plugin/ochttp/propagation/tracecontext"
+	"go.opencensus.io/trace"
+)
 
 var (
 	requestDurationsHistogram = prometheus.NewHistogram(prometheus.HistogramOpts{
@@ -61,9 +59,29 @@ func main() {
 		log.Fatalf("bad value for rps limit: %s", rpsLimitStr)
 	}
 
-	// ctr := &metrics{
-	// 	lastTime: time.Now(),
-	// }
+	serviceName := os.Getenv("SERVICE_NAME")
+	if len(serviceName) == 0 {
+		serviceName = "go-app"
+	}
+	agentHostName := os.Getenv("OCAGENT_TRACE_EXPORTER_ENDPOINT")
+	if len(agentHostName) == 0 {
+		agentHostName = "127.0.0.1"
+	}
+	log.Printf("new ocagent with: %s at %s", serviceName, agentHostName)
+	exporter, err := ocagent.NewExporter(
+		ocagent.WithInsecure(),
+		ocagent.WithServiceName(serviceName),
+		//ocagent.WithAddress(agentHostName),
+	)
+	if err != nil {
+		log.Fatal("Failed to create the agent exporter: %v", err)
+	}
+	trace.RegisterExporter(exporter)
+	// Always trace for this demo. In a production application, you should
+	// configure this to a trace.ProbabilitySampler set at the desired
+	// probability.
+	trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
+
 	throttledHandler := throttler(
 		//	ctr,
 		rpsLimit,
@@ -73,7 +91,7 @@ func main() {
 	http.Handle("/metrics", promhttp.Handler())
 	http.Handle("/", instrumentHandler(throttledHandler))
 	//	go rpsTelemetryCalculator(ctr)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8080", &ochttp.Handler{Propagation: &tracecontext.HTTPFormat{}}))
 }
 
 func throttler(

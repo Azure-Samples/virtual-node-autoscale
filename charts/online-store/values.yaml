@@ -2,7 +2,14 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-
+lf:
+  image:
+    repository: jeremyrickard/lf-host
+    tag: latest
+    pullPolicy: Always
+  service:
+      type: ClusterIP
+      port: 55678
 
 app:
   throttle:
@@ -70,3 +77,9 @@ hpa:
   metricTarget: 10
   minReplicas: 2 
   maxReplicas: 60
+
+
+## Required; this is the instrumentation key that will be used
+## for communication with Application Insights. Must be provided
+appInsight:
+  key:

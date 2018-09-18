@@ -28,12 +28,31 @@ spec:
               value: {{ .Values.app.throttle.sleep | quote }}
             - name: RPS_THRESHOLD
               value: {{ .Values.app.throttle.limit | quote }}
+            - name: SERVICE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
           ports:
             - name: http
               containerPort: 8080
               protocol: TCP
           resources:
 {{ toYaml .Values.app.resources | indent 12 }}
+        - name: {{ .Chart.Name }}-lf
+          image: "{{ .Values.lf.image.repository }}:{{ .Values.lf.image.tag }}"
+          imagePullPolicy: {{ .Values.app.image.pullPolicy }}
+          env:
+          - name: APPINSIGHTS_INSTRUMENTATIONKEY
+            valueFrom:
+                secretKeyRef:
+                  name: {{ template "adoptdog.fullname" . }}
+                  key: instrumentation-key
+          ports:
+            - name: http
+              containerPort: 55678
+              protocol: TCP
+          resources:
+{{ toYaml .Values.lf.resources | indent 12 }}
     {{- with .Values.app.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
