@@ -10,4 +10,4 @@ spec:
   serviceAccountName: prometheus
   serviceMonitorSelector:
     matchLabels:
-      team: rps-demo 
+      team: online-store 
