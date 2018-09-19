@@ -9,8 +9,8 @@ admissionRegistration:
   failurePolicy: Ignore
   # enableNamespacesByDefault: true
 controller:
-  image: lachlanevenson/vn-affinity-admission-controller
-  imageTag: canary
+  image: virtualnode.azurecr.io/virtualnode/samples/vn-affinity-admission-controller
+  imageTag: latest
   imagePullPolicy: Always
   serviceAccount: vn-affinity-admission-controller
   tls:
