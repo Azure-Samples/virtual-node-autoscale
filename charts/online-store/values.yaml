@@ -11,7 +11,7 @@ app:
 
   replicaCount: 1
   image:
-    repository: jeremyrickard/rps-prom
+    repository: virtualnode.azurecr.io/virtualnode/samples/online-store
     tag: latest
     pullPolicy: Always
   
@@ -55,14 +55,14 @@ app:
 
   affinity: {}
 
-promMonitor: rps-demo
+promMonitor: online-store
 
 counter:
   replicaCount: 1
   # The watcher will report pods on this node separately
   specialNodeName: 
   image:
-    repository: jeremyrickard/container-counter
+    repository: virtualnode.azurecr.io/virtualnode/samples/container-counter
     tag: latest 
     pullPolicy: Always 
 
