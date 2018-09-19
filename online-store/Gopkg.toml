@@ -24,6 +24,17 @@
 #   go-tests = true
 #   unused-packages = true
 
+[[constraint]]
+  name = "github.com/census-instrumentation/opencensus-go"
+  branch = "master"
+
+[[constraint]]
+  name = "github.com/census-instrumentation/opencensus-proto"
+  branch = "master"
+
+[[constraint]]
+  name = "github.com/census-ecosystem/opencensus-go-exporter-ocagent"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/prometheus/client_golang"

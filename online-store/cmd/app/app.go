@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"time"
 
 	"golang.org/x/time/rate"
 
@@ -36,23 +35,14 @@ func instrumentHandler(
 ) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			now := time.Now()
 			t := prometheus.NewTimer(requestDurationsHistogram)
-			handler.ServeHTTP(w, r)
 			defer t.ObserveDuration()
-			diff := time.Since(now)
-			log.Printf("Finished request : %v", diff.Seconds())
+			handler.ServeHTTP(w, r)
 		},
 	)
 }
 
 func main() {
-	sleepSecondsStr := os.Getenv("SLEEP_SECONDS")
-	sleepSeconds, err := strconv.Atoi(sleepSecondsStr)
-	if err != nil {
-		log.Fatalf("bad value for sleep seconds: %s", sleepSecondsStr)
-	}
-
 	rpsLimitStr := os.Getenv("RPS_THRESHOLD")
 	rpsLimit, err := strconv.ParseFloat(rpsLimitStr, 64)
 	if err != nil {
@@ -63,19 +53,15 @@ func main() {
 	if len(serviceName) == 0 {
 		serviceName = "go-app"
 	}
-	agentHostName := os.Getenv("OCAGENT_TRACE_EXPORTER_ENDPOINT")
-	if len(agentHostName) == 0 {
-		agentHostName = "127.0.0.1"
-	}
-	log.Printf("new ocagent with: %s at %s", serviceName, agentHostName)
+	log.Printf("new ocagent named %s", serviceName)
 	exporter, err := ocagent.NewExporter(
 		ocagent.WithInsecure(),
 		ocagent.WithServiceName(serviceName),
-		//ocagent.WithAddress(agentHostName),
 	)
 	if err != nil {
 		log.Fatal("Failed to create the agent exporter: %v", err)
 	}
+
 	trace.RegisterExporter(exporter)
 	// Always trace for this demo. In a production application, you should
 	// configure this to a trace.ProbabilitySampler set at the desired
@@ -83,21 +69,22 @@ func main() {
 	trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
 
 	throttledHandler := throttler(
-		//	ctr,
 		rpsLimit,
-		sleepSeconds,
 		http.FileServer(http.Dir("/app/content")),
 	)
 	http.Handle("/metrics", promhttp.Handler())
 	http.Handle("/", instrumentHandler(throttledHandler))
-	//	go rpsTelemetryCalculator(ctr)
-	log.Fatal(http.ListenAndServe(":8080", &ochttp.Handler{Propagation: &tracecontext.HTTPFormat{}}))
+	log.Fatal(http.ListenAndServe(":8080",
+		&ochttp.Handler{
+			Propagation:      &tracecontext.HTTPFormat{},
+			IsPublicEndpoint: true,
+		},
+	),
+	)
 }
 
 func throttler(
-	//ctr *metrics,
 	limit float64,
-	sleepSeconds int,
 	handler http.Handler,
 ) http.Handler {
 	limiter := rate.NewLimiter(rate.Limit(limit), 10)

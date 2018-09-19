@@ -45,7 +45,7 @@ spec:
           - name: APPINSIGHTS_INSTRUMENTATIONKEY
             valueFrom:
                 secretKeyRef:
-                  name: {{ template "adoptdog.fullname" . }}
+                  name: {{ template "online-store.fullname" . }}
                   key: instrumentation-key
           ports:
             - name: http

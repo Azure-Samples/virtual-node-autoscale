@@ -4,9 +4,6 @@ WORKDIR /go/src/online-store
 COPY vendor/ vendor/
 COPY cmd/app cmd/app
 COPY public/ public
-RUN go get go.opencensus.io/trace
-RUN go get go.opencensus.io/plugin/ochttp
-RUN go get contrib.go.opencensus.io/exporter/ocagent
 RUN go build -o bin/app ./cmd/app
 
 FROM scratch
