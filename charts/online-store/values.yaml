@@ -7,7 +7,7 @@
 app:
   throttle:
     sleep: 1
-    limit: 100
+    limit: 200
 
   replicaCount: 1
   image:
@@ -69,4 +69,4 @@ counter:
 hpa:
   metricTarget: 10
   minReplicas: 2 
-  maxReplicas: 10
+  maxReplicas: 60
