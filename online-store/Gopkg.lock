@@ -18,7 +18,7 @@
   revision = "3a771d992973f24aa725d07868b467d1ddfceafb"
 
 [[projects]]
-  digest = "1:a0a3b3685bb73b56f98f013199c2337f213c6049ca6c712e00b91c7bbe9eb757"
+  digest = "1:5f43e9976f8578098538c2538f534b4718512eef6a6a8923892a49c2de45ace2"
   name = "github.com/census-instrumentation/opencensus-proto"
   packages = [
     "gen-go/agent/common/v1",
