@@ -24,16 +24,37 @@ spec:
           image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
           imagePullPolicy: {{ .Values.app.image.pullPolicy }}
           env:
-            - name: SLEEP_SECONDS
-              value: {{ .Values.app.throttle.sleep | quote }}
+            - name: APP_INSIGHT_ENABLED
+              value: {{ .Values.appInsight.enabled | quote }}
             - name: RPS_THRESHOLD
               value: {{ .Values.app.throttle.limit | quote }}
+            - name: SERVICE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
           ports:
             - name: http
               containerPort: 8080
               protocol: TCP
           resources:
 {{ toYaml .Values.app.resources | indent 12 }}
+        {{- if .Values.appInsight.enabled }}
+        - name: {{ .Chart.Name }}-lf
+          image: "{{ .Values.lf.image.repository }}:{{ .Values.lf.image.tag }}"
+          imagePullPolicy: {{ .Values.app.image.pullPolicy }}
+          env:
+          - name: APPINSIGHTS_INSTRUMENTATIONKEY
+            valueFrom:
+                secretKeyRef:
+                  name: {{ template "online-store.fullname" . }}
+                  key: instrumentation-key
+          ports:
+            - name: http
+              containerPort: 55678
+              protocol: TCP
+          resources:
+{{ toYaml .Values.lf.resources | indent 12 }}
+        {{- end }}
     {{- with .Values.app.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}

@@ -2,7 +2,14 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-
+lf:
+  image:
+    repository: virtualnode.azurecr.io/virtualnode/samples/public/live-metrics-forwarder
+    tag: latest
+    pullPolicy: Always
+  service:
+      type: ClusterIP
+      port: 55678
 
 app:
   throttle:
@@ -70,3 +77,10 @@ hpa:
   metricTarget: 10
   minReplicas: 2 
   maxReplicas: 60
+
+appInsight:
+  ## flag to enable App Insight Integration
+  enabled: true
+  ## Required if enabled; this is the instrumentation key that will be used
+  ## for communication with Application Insights. Must be provided
+  key:
