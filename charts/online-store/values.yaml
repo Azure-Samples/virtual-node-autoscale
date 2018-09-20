@@ -11,7 +11,7 @@ app:
 
   replicaCount: 1
   image:
-    repository: virtualnode.azurecr.io/virtualnode/samples/online-store
+    repository: virtualnode.azurecr.io/virtualnode/samples/public/online-store
     tag: latest
     pullPolicy: Always
   
@@ -62,7 +62,7 @@ counter:
   # The watcher will report pods on this node separately
   specialNodeName: 
   image:
-    repository: virtualnode.azurecr.io/virtualnode/samples/container-counter
+    repository: virtualnode.azurecr.io/virtualnode/samples/public/container-counter
     tag: latest 
     pullPolicy: Always 
 
