@@ -43,10 +43,11 @@ type watcher struct {
 	podLabel  string
 	k8sClient *kubernetes.Clientset
 	nodeName  string
+	interval  int
 }
 
 func (w *watcher) Run() error {
-	tickChan := time.NewTicker(time.Second * 30).C
+	tickChan := time.NewTicker(time.Second * time.Duration(w.interval)).C
 	for {
 		<-tickChan
 		w.sendUpdatedMetrics()
@@ -79,12 +80,20 @@ func (w *watcher) sendUpdatedMetrics() {
 	containerCounter.Set(float64(nvkp))
 }
 
-func New(podLabel, namespace, nodeName, kubeConfig string) (Watcher, error) {
+type WatcherOpts struct {
+	PodLabel       string
+	Namespace      string
+	NodeName       string
+	KubeConfig     string
+	ScrapeInterval int
+}
+
+func New(opts WatcherOpts) (Watcher, error) {
 	var config *rest.Config
 	// Check if the kubeConfig file exists.
-	if _, err := os.Stat(kubeConfig); !os.IsNotExist(err) {
+	if _, err := os.Stat(opts.KubeConfig); !os.IsNotExist(err) {
 		// Get the kubeconfig from the filepath.
-		config, err = clientcmd.BuildConfigFromFlags("", kubeConfig)
+		config, err = clientcmd.BuildConfigFromFlags("", opts.KubeConfig)
 		if err != nil {
 			return nil, err
 		}
@@ -101,11 +110,17 @@ func New(podLabel, namespace, nodeName, kubeConfig string) (Watcher, error) {
 		return nil, err
 	}
 
+	// Default to 5 if not set
+	if opts.ScrapeInterval <= 0 {
+		opts.ScrapeInterval = 5
+	}
+
 	return &watcher{
 			k8sClient: clientset,
-			namespace: namespace,
-			podLabel:  podLabel,
-			nodeName:  nodeName,
+			namespace: opts.Namespace,
+			podLabel:  opts.PodLabel,
+			nodeName:  opts.NodeName,
+			interval:  opts.ScrapeInterval,
 		},
 		nil
 }
