@@ -2,7 +2,7 @@ DOCKER_IMAGE ?= virtualnode.azurecr.io/virtualnode/samples/public/vn-affinity-ad
 GIT_BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD)
 
 ifeq ($(GIT_BRANCH),master)
-	DOCKER_TAG = canary
+	DOCKER_TAG = latest
 else
 	DOCKER_TAG = $(GIT_BRANCH)
 endif
