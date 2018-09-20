@@ -18,7 +18,7 @@ lf:
 app:
   throttle:
     sleep: 1
-    limit: 200
+    limit: 100
 
   replicaCount: 1
   image:
