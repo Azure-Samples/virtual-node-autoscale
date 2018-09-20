@@ -9,7 +9,7 @@ admissionRegistration:
   failurePolicy: Ignore
   # enableNamespacesByDefault: true
 controller:
-  image: virtualnode.azurecr.io/virtualnode/samples/vn-affinity-admission-controller
+  image: virtualnode.azurecr.io/virtualnode/samples/public/vn-affinity-admission-controller
   imageTag: latest
   imagePullPolicy: Always
   serviceAccount: vn-affinity-admission-controller
