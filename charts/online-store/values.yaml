@@ -10,6 +10,10 @@ lf:
   service:
       type: ClusterIP
       port: 55678
+  resources:
+    requests:
+      cpu: 500m
+      memory: 0.1G
 
 app:
   throttle:
