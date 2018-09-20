@@ -49,38 +49,42 @@ func main() {
 		log.Fatalf("bad value for rps limit: %s", rpsLimitStr)
 	}
 
-	serviceName := os.Getenv("SERVICE_NAME")
-	if len(serviceName) == 0 {
-		serviceName = "go-app"
-	}
-	log.Printf("new ocagent named %s", serviceName)
-	exporter, err := ocagent.NewExporter(
-		ocagent.WithInsecure(),
-		ocagent.WithServiceName(serviceName),
-	)
-	if err != nil {
-		log.Fatal("Failed to create the agent exporter: %v", err)
-	}
-
-	trace.RegisterExporter(exporter)
-	// Always trace for this demo. In a production application, you should
-	// configure this to a trace.ProbabilitySampler set at the desired
-	// probability.
-	trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
-
 	throttledHandler := throttler(
 		rpsLimit,
 		http.FileServer(http.Dir("/app/content")),
 	)
 	http.Handle("/metrics", promhttp.Handler())
 	http.Handle("/", instrumentHandler(throttledHandler))
-	log.Fatal(http.ListenAndServe(":8080",
-		&ochttp.Handler{
+
+	appInsightEnabledStr := os.Getenv("APP_INSIGHT_ENABLED")
+	var handler http.Handler
+	if appInsightEnabledStr == "true" {
+		serviceName := os.Getenv("SERVICE_NAME")
+		if len(serviceName) == 0 {
+			serviceName = "go-app"
+		}
+		log.Printf("new ocagent named %s", serviceName)
+		exporter, err := ocagent.NewExporter(
+			ocagent.WithInsecure(),
+			ocagent.WithServiceName(serviceName),
+		)
+		if err != nil {
+			log.Fatal("Failed to create the agent exporter: %v", err)
+		}
+
+		trace.RegisterExporter(exporter)
+		// Always trace for this demo. In a production application, you should
+		// configure this to a trace.ProbabilitySampler set at the desired
+		// probability.
+		trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
+		handler = &ochttp.Handler{
 			Propagation:      &tracecontext.HTTPFormat{},
 			IsPublicEndpoint: true,
-		},
-	),
-	)
+		}
+
+	}
+	log.Fatal(http.ListenAndServe(":8080", handler))
+
 }
 
 func throttler(

@@ -78,8 +78,9 @@ hpa:
   minReplicas: 2 
   maxReplicas: 60
 
-
-## Required; this is the instrumentation key that will be used
-## for communication with Application Insights. Must be provided
 appInsight:
+  ## flag to enable App Insight Integration
+  enabled: true
+  ## Required if enabled; this is the instrumentation key that will be used
+  ## for communication with Application Insights. Must be provided
   key:
