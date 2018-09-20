@@ -4,7 +4,7 @@
 
 lf:
   image:
-    repository: jeremyrickard/lf-host
+    repository: virtualnode.azurecr.io/virtualnode/samples/public/live-metrics-forwarder
     tag: latest
     pullPolicy: Always
   service:
