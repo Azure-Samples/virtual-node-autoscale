@@ -70,6 +70,8 @@ promMonitor: online-store
 
 counter:
   replicaCount: 1
+  # The interval in seconds
+  interval: 5
   # The watcher will report pods on this node separately
   specialNodeName: 
   image:

@@ -37,5 +37,7 @@ spec:
               value: {{ .Release.Namespace }}
             - name: LABEL_SELECTOR
               value: "app={{ template "online-store.name" . }}"
+            - name: SCRAPE_INTERVAL
+              value: {{ .Values.counter.interval | quote }}
             - name: SPECIAL_NODE_NAME
               value: {{ required "A value is required for counter.specialNodeName" .Values.counter.specialNodeName}}
