@@ -23,14 +23,6 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /metrics
-              port: 8080
-          readinessProbe:
-            httpGet:
-              path: /metrics
-              port: 8080
           imagePullPolicy: {{ .Values.counter.image.pullPolicy }}
           env:
             - name: NAMESPACE
