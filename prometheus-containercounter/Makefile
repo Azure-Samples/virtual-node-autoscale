@@ -1,4 +1,4 @@
-DOCKER_IMAGE ?= virtualnode.azurecr.io/virtualnode/samples/public/container-counter
+DOCKER_IMAGE ?= virtualnode.azurecr.io/public/virtualnode/samples/container-counter
 GIT_BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD)
 
 ifeq ($(GIT_BRANCH),master)
