@@ -10,7 +10,7 @@ This repository demonstrates how to use custom metrics in combination with the K
 
 ## Initialize Helm
 
-Helm will be used to install the both the demo application and the supporting components. First ensure you have Helm [installed](https://docs.helm.sh/using_helm/#installing-helm). Once installed, you will need to initialize your cluster to use Helm. 
+Helm will be used to install the both the demo application and the supporting components. First ensure you have Helm [installed](https://docs.helm.sh/using_helm/#installing-helm). Once installed, you will need to initialize your cluster to use Helm. To do this, you will install the `Tiller` component with the `helm init` command.
 
 ```
 kubectl -n kube-system create sa tiller
