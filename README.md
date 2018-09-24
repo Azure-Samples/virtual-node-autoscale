@@ -8,6 +8,16 @@ This repository demonstrates how to use custom metrics in combination with the K
 * MutatingAdmissionWebhook admission controller activated - (https://kubernetes.io/docs/admin/extensible-admission-controllers/#external-admission-webhooks).
 * Running Ingress controller (nginx or similar)
 
+## Initialize Helm
+
+Helm will be used to install the both the demo application and the supporting components. First ensure you have Helm [installed](https://docs.helm.sh/using_helm/#installing-helm). Once installed, you will need to initialize your cluster to use Helm. 
+
+```
+kubectl -n kube-system create sa tiller
+kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
+helm init --service-account tiller
+```
+
 ## Install Virtual node admission-controller (OPTIONAL)
 
 In order to control the Kubernetes scheduler to "favor" VM backed Kubernetes nodes BEFORE scaling out to the virtual node we can use a Kubernetes Webhook Admission Controller to add pod affinity and toleration key/values to all pods in a correctly labeled namespace. 
@@ -45,7 +55,7 @@ spec:
 ### Install
 
 ```
-helm install --name vn-affinity charts/vn-affinity-admission-controller --namespace vn-affinity
+helm install --name vn-affinity ./charts/vn-affinity-admission-controller --namespace vn-affinity
 ```
 
 Label the namespace you wish enable the webhook to function on
