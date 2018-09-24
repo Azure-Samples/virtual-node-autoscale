@@ -10,7 +10,7 @@ This repository demonstrates how to use custom metrics in combination with the K
 
 ## Install Virtual node admission-controller (OPTIONAL)
 
-In order to control the Kubernetes scheduler to "favor" VM backed Kubernetes nodes BEFORE scaling out to the virtual node we can use a Kubernetes Webhook Admission Controller to add pod affinity and toleration key/values to all pods in a correctly labeled namespace. 
+In order to control the Kubernetes scheduler to "favor" VM backed Kubernetes nodes BEFORE scaling out to the virtual node we can use a Kubernetes Webhook Admission Controller to add pod affinity and toleration key/values to all pods in a correctly labeled namespace.
 
 ### Pod patches
 
@@ -98,13 +98,22 @@ export VK_NODE_NAME=<your_node_name>
 export INGRESS_EXTERNAL_IP=<ingress_external_ip>
 ```
 
+By default, the online store will also send data to [Application Insights](https://docs.microsoft.com/en-us/azure/application-insights/app-insights-nodejs-quick-start#enable-application-insights). Once you have created a workspace, you'll need the [`Instrumentation Key`](https://docs.microsoft.com/en-us/azure/application-insights/app-insights-nodejs-quick-start#configure-app-insights-sdk). If you'd prefer to run without Application Insights, you can skip this step.
+
 ```bash
-helm install ./charts/online-store --name online-store --set counter.specialNodeName=$VK_NODE_NAME,app.ingress.host=store.$INGRESS_EXTERNAL_IP.nip.io
+export APP_INSIGHT_KEY=<INSTRUMENTATION_KEY>
+helm install ./charts/online-store --name online-store --set counter.specialNodeName=$VK_NODE_NAME,app.ingress.host=store.$INGRESS_EXTERNAL_IP.nip.io,appInsight.key=$APP_INSIGHT_KEY
 ```
 
 This will deploy with an ingress and should create the HPA, Prometheus ServiceMonitor and everything else needed, except the adapter. Do that next.
 
 Change the values.yaml as needed (especially for ingress)
+
+To run this demo without Application Insights, run the command:
+
+```bash
+helm install ./charts/online-store --name online-store --set counter.specialNodeName=$VK_NODE_NAME,app.ingress.host=store.$INGRESS_EXTERNAL_IP.nip.io,appInsight.enabled=false
+```
 
 ## Deploy the Prometheus Metric Adapter
 
