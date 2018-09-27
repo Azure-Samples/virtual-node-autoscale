@@ -2,6 +2,8 @@
 
 This repository demonstrates how to use custom metrics in combination with the Kubernetes Horizontal Pod Autoscaler to autoscale an application. Virtual nodes let you scale quickly and easily run Kubernetes pods on Azure Container Instances where you'll pay only for the container instance runtime. This repository will guide you through first installing the virtual node admission controller, followed by the Prometheus Operator. Then create a Prometheus instance and install the Prometheus Metric Adapter. With these in place, the provided Helm chart will install our demo application, along with supporting monitoring components, like a **ServiceMonitor** for Prometheus, a Horizontal Pod Autoscaler, and a custom container that will count the instances of the application and expose them to Prometheus. Finally, an optional Grafana dashboard can be installed to view the metrics in real-time.
 
+This demo was used at Microsoft Ignite 2018 Kenote. Check out the [video](https://mediastream.microsoft.com/events/2018/1809/Ignite/player/tracks/track2.html?start=17300).
+
 ## Prerequisites
 * Virtual node enabled AKS cluster running Kubernetes version 1.10 or later
 * Advanced Networking
