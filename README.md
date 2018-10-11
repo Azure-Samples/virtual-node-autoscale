@@ -1,13 +1,15 @@
 # Virutal node Autoscale Demo
 
-This repository demonstrates how to use custom metrics in combination with the Kubernetes Horizontal Pod Autoscaler to autoscale an application. Virtual nodes let you scale quickly and easily run Kubernetes pods on Azure Container Instances where you'll pay only for the container instance runtime. This repository will guide you through first installing the virtual node admission controller, followed by the Prometheus Operator. Then create a Prometheus instance and install the Prometheus Metric Adapter. With these in place, the provided Helm chart will install our demo application, along with supporting monitoring components, like a **ServiceMonitor** for Prometheus, a Horizontal Pod Autoscaler, and a custom container that will count the instances of the application and expose them to Prometheus. Finally, an optional Grafana dashboard can be installed to view the metrics in real-time.
+This repository demonstrates how to use custom metrics in combination with the Kubernetes Horizontal Pod Autoscaler to autoscale an application. Virtual nodes let you scale quickly and easily run Kubernetes pods on Azure Container Instances where you'll pay only for the container instance runtime. 
+
+This repository will guide you through first installing the virtual node admission controller, followed by the Prometheus Operator. Then create a Prometheus instance and install the Prometheus Metric Adapter. With these in place, the provided Helm chart will install our demo application, along with supporting monitoring components, like a **ServiceMonitor** for Prometheus, a Horizontal Pod Autoscaler, and a custom container that will count the instances of the application and expose them to Prometheus. Finally, an optional Grafana dashboard can be installed to view the metrics in real-time.
 
 This demo was used at Microsoft Ignite 2018 Kenote. Check out the [video](https://mediastream.microsoft.com/events/2018/1809/Ignite/player/tracks/track2.html?start=17300).
 
 ## Prerequisites
-* Virtual node enabled AKS cluster running Kubernetes version 1.10 or later
-* Advanced Networking
-* MutatingAdmissionWebhook admission controller activated - (https://kubernetes.io/docs/admin/extensible-admission-controllers/#external-admission-webhooks).
+* [Virtual node enabled AKS cluster](https://docs.microsoft.com/azure/aks/virtual-kubelet) running Kubernetes version 1.10 or later
+* Setup AKS with Advanced Networking
+* [MutatingAdmissionWebhook admission controller](https://kubernetes.io/docs/admin/extensible-admission-controllers/#external-admission-webhooks) activated
 * Running Ingress controller (nginx or similar)
 
 ## Initialize Helm
@@ -20,7 +22,7 @@ kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceac
 helm init --service-account tiller
 ```
 
-## Install Virtual node admission-controller (OPTIONAL)
+## Install Virtual Node admission-controller (OPTIONAL)
 
 In order to control the Kubernetes scheduler to "favor" VM backed Kubernetes nodes BEFORE scaling out to the virtual node we can use a Kubernetes Webhook Admission Controller to add pod affinity and toleration key/values to all pods in a correctly labeled namespace. 
 
@@ -67,13 +69,13 @@ kubectl label namespace default vn-affinity-injection=enabled
 
 ## Install Prometheus Operator
 
-We will use the Prometheus Operator to create the Prometheus cluster and to create the relevant configuration to monitor our app. So first, install the operator:
+We will use the [Prometheus Operator](https://coreos.com/operators/prometheus/docs/latest/user-guides/getting-started.html) to create the Prometheus cluster and to create the relevant configuration to monitor our app. So first, install the operator:
 
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/bundle.yaml
 ```
 
-This will create a number of CRDs, Service Accounts and RBAC things. Once it's finished, you'll have the Prometheus Operator, but not a Prometheus instance. You'll need to create one of those next. 
+This will create a number of CRDs, Service Accounts and RBAC things. Once it's finished, you'll have the Prometheus Operator, but not a Prometheus instance. We will create one of those next. 
 
 ## Create a Prometheus instance
 
@@ -105,26 +107,48 @@ In this case, it's Virtual Kubelet. If you've installed with the ACI Connector, 
 
 Export the node name to an environment variable
 
-```base
+```bash
 export VK_NODE_NAME=<your_node_name>
+```
+
+Next, export the external IP address of your ingress point by retrieving details of your kube-system.
+
+```bash
+kubectl get svc --all-namespaces
+``
+
+In this example output it is 104.40.223.193.
+
+```bash
+NAMESPACE     NAME                                                  TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)                      AGE
+default       kubernetes                                            ClusterIP      10.0.0.1       <none>      443/TCP                      4h
+default       prometheus-operated                                   ClusterIP      None           <none>      9090/TCP                     21m
+default       prometheus-prometheus-0                               ClusterIP      10.0.188.67    <none>      9090/TCP                     21m
+kube-system   addon-http-application-routing-default-http-backend   ClusterIP      10.0.253.241   <none>      80/TCP                       4h
+kube-system   addon-http-application-routing-nginx-ingress          LoadBalancer   10.0.91.10     104.40.223.193   80:31237/TCP,443:30963/TCP   4h
+```
+
+Export this external IP to an environment variable as well.
+
+```bash
 export INGRESS_EXTERNAL_IP=<ingress_external_ip>
 ```
+
+Change the values.yaml in `/virtual-node-autoscale/charts/online-store` as needed (especially for ingress). For example, an Application Insights key will need to be provided.
+
+Now this will deploy with an ingress and create the HPA, Prometheus Service Monitor and everything else needed, except the adapter which will be deployed next.
 
 ```bash
 helm install ./charts/online-store --name online-store --set counter.specialNodeName=$VK_NODE_NAME,app.ingress.host=store.$INGRESS_EXTERNAL_IP.nip.io
 ```
 
-This will deploy with an ingress and should create the HPA, Prometheus ServiceMonitor and everything else needed, except the adapter. Do that next.
-
-Change the values.yaml as needed (especially for ingress)
-
 ## Deploy the Prometheus Metric Adapter
+
+NOTE: if you have the Azure application insights adapter installed, you'll need to remove that first.
 
 ```bash
 helm install stable/prometheus-adapter --name prometheus-adaptor -f prometheus-config/prometheus-adapter/values.yaml
 ```
-
-NOTE: if you have the Azure application insights adapter installed, you'll need to remove that first.
 
 There might be some lag time between when you create the adapter and when the metrics are available.
 
