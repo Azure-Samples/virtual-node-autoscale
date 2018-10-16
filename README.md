@@ -59,7 +59,7 @@ spec:
 ### Install
 
 ```
-helm install --name vn-affinity ./charts/vn-affinity-admission-controller --namespace vn-affinity
+helm install --name vn-affinity ./charts/vn-affinity-admission-controller
 ```
 
 Label the namespace you wish enable the webhook to function on
