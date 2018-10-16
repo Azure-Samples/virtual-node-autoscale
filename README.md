@@ -117,7 +117,12 @@ export VK_NODE_NAME=<your_node_name>
 
 ### Export the ingress external IP address
 
-Stated in the pre-requisites, an ingress solution must exist to accept requests from the sample application. The easiest way to set this up is by installing the [HTTP application routing add-on for AKS](https://docs.microsoft.com/azure/aks/http-application-routing)].
+Stated in the pre-requisites, an ingress solution must exist to accept requests from the sample application. The easiest way to set this up is by installing the [HTTP application routing add-on for AKS](https://docs.microsoft.com/azure/aks/http-application-routing).
+
+This can be installed with the following add-on command.
+```bash
+az aks enable-addons --resource-group myResourceGroup --name myAKSCluster --addons http_application_routing
+```
 
 Once installed, export the external IP address of your ingress point by retrieving details of your kube-system.
 
