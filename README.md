@@ -175,7 +175,7 @@ helm install ./charts/online-store --name online-store --set counter.specialNode
 NOTE: if you have the Azure application insights adapter installed, you'll need to remove that first.
 
 ```bash
-helm install stable/prometheus-adapter --name prometheus-adaptor -f prometheus-config/prometheus-adapter/values.yaml
+helm install stable/prometheus-adapter --name prometheus-adaptor -f ./online-store/prometheus-config/prometheus-adapter/values.yaml
 ```
 
 There might be some lag time between when you create the adapter and when the metrics are available.
