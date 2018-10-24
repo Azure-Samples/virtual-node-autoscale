@@ -24,7 +24,7 @@ helm init --service-account tiller
 
 ## Install Virtual Node admission-controller (OPTIONAL)
 
-In order to control the Kubernetes scheduler to "favor" VM backed Kubernetes nodes BEFORE scaling out to the virtual node we can use a Kubernetes Webhook Admission Controller to add pod affinity and toleration key/values to all pods in a correctly labeled namespace. 
+In order to control the Kubernetes scheduler to "favor" VM backed Kubernetes nodes BEFORE scaling out to the virtual node we can use a Kubernetes Webhook Admission Controller to add pod affinity and toleration key/values to all pods in a correctly labeled namespace.
 
 ### Pod patches
 
@@ -59,7 +59,7 @@ spec:
 ### Install
 
 ```
-helm install --name vn-affinity ./charts/vn-affinity-admission-controller --namespace vn-affinity
+helm install --name vn-affinity ./charts/vn-affinity-admission-controller
 ```
 
 Label the namespace you wish enable the webhook to function on
@@ -93,16 +93,20 @@ kubectl expose pod prometheus-prometheus-0 --port 9090 --target-port 9090
 
 ## Deploy online-store app
 
-You will need your Virtual Kubelet node name to install the app. The app will install a counter that will get the pod count for the application and provide a metric for pods on Virtual Kubelet and pods on all other nodes.
+You will need your Virtual Kubelet node name, external IP address for Ingress, and decide if you wish to use App Insights to install the online-store app. 
+
+### Export Virtual Kubelet node name
+The app will also install a counter that will get the pod count for the application and provide a metric for pods on Virtual Kubelet and pods on all other nodes.
 
 ```bash
 $ kubectl get nodes
-AME                       STATUS    ROLES     AGE       VERSION
+NAME                       STATUS    ROLES     AGE       VERSION
 aks-nodepool1-30440750-0   Ready     agent     27d       v1.10.6
 aks-nodepool1-30440750-1   Ready     agent     27d       v1.10.6
 aks-nodepool1-30440750-2   Ready     agent     27d       v1.10.6
 virtual-kubelet            Ready     agent     16h       v1.8.3
 ```
+
 In this case, it's Virtual Kubelet. If you've installed with the ACI Connector, you may have a node name like **virtual-kubelet-aci-connector-linux-westcentralus**.
 
 Export the node name to an environment variable
@@ -111,13 +115,22 @@ Export the node name to an environment variable
 export VK_NODE_NAME=<your_node_name>
 ```
 
-Next, export the external IP address of your ingress point by retrieving details of your kube-system.
+### Export the ingress external IP address
+
+Stated in the pre-requisites, an ingress solution must exist to accept requests from the sample application. The easiest way to set this up is by installing the [HTTP application routing add-on for AKS](https://docs.microsoft.com/azure/aks/http-application-routing).
+
+This can be installed with the following add-on command.
+```bash
+az aks enable-addons --resource-group myResourceGroup --name myAKSCluster --addons http_application_routing
+```
+
+Once installed, export the external IP address of your ingress point by retrieving details of your kube-system.
 
 ```bash
 kubectl get svc --all-namespaces
-``
+```
 
-In this example output it is 104.40.223.193.
+In this example output using NGINX for ingress, it is 104.40.223.193.
 
 ```bash
 NAMESPACE     NAME                                                  TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)                      AGE
@@ -128,13 +141,28 @@ kube-system   addon-http-application-routing-default-http-backend   ClusterIP   
 kube-system   addon-http-application-routing-nginx-ingress          LoadBalancer   10.0.91.10     104.40.223.193   80:31237/TCP,443:30963/TCP   4h
 ```
 
-Export this external IP to an environment variable as well.
+Export this external IP to an environment variable.
 
 ```bash
 export INGRESS_EXTERNAL_IP=<ingress_external_ip>
 ```
+### Set Application Insights on or off
 
-Change the values.yaml in `/virtual-node-autoscale/charts/online-store` as needed (especially for ingress). For example, an Application Insights key will need to be provided.
+By default, the online store will also send data to [Application Insights](https://docs.microsoft.com/en-us/azure/application-insights/app-insights-nodejs-quick-start#enable-application-insights). Once you have created a workspace, you'll need the [`Instrumentation Key`](https://docs.microsoft.com/en-us/azure/application-insights/app-insights-nodejs-quick-start#configure-app-insights-sdk). If you'd prefer to run without Application Insights, you can skip this step.
+
+```bash
+export APP_INSIGHT_KEY=<INSTRUMENTATION_KEY>
+helm install ./charts/online-store --name online-store --set counter.specialNodeName=$VK_NODE_NAME,app.ingress.host=store.$INGRESS_EXTERNAL_IP.nip.io,appInsight.key=$APP_INSIGHT_KEY
+```
+To run this demo **without** Application Insights, run the command:
+
+```bash
+helm install ./charts/online-store --name online-store --set counter.specialNodeName=$VK_NODE_NAME,app.ingress.host=store.$INGRESS_EXTERNAL_IP.nip.io,appInsight.enabled=false
+```
+
+## Deploy the Prometheus Metric Adapter
+
+Change the values.yaml in `/virtual-node-autoscale/charts/online-store` as needed (especially for ingress).
 
 Now this will deploy with an ingress and create the HPA, Prometheus Service Monitor and everything else needed, except the adapter which will be deployed next.
 
@@ -147,7 +175,7 @@ helm install ./charts/online-store --name online-store --set counter.specialNode
 NOTE: if you have the Azure application insights adapter installed, you'll need to remove that first.
 
 ```bash
-helm install stable/prometheus-adapter --name prometheus-adaptor -f prometheus-config/prometheus-adapter/values.yaml
+helm install stable/prometheus-adapter --name prometheus-adaptor -f ./online-store/prometheus-config/prometheus-adapter/values.yaml
 ```
 
 There might be some lag time between when you create the adapter and when the metrics are available.
