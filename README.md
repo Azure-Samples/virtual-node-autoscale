@@ -162,16 +162,6 @@ helm install ./charts/online-store --name online-store --set counter.specialNode
 
 ## Deploy the Prometheus Metric Adapter
 
-Change the values.yaml in `/virtual-node-autoscale/charts/online-store` as needed (especially for ingress).
-
-Now this will deploy with an ingress and create the HPA, Prometheus Service Monitor and everything else needed, except the adapter which will be deployed next.
-
-```bash
-helm install ./charts/online-store --name online-store --set counter.specialNodeName=$VK_NODE_NAME,app.ingress.host=store.$INGRESS_EXTERNAL_IP.nip.io
-```
-
-## Deploy the Prometheus Metric Adapter
-
 NOTE: if you have the Azure application insights adapter installed, you'll need to remove that first.
 
 ```bash
