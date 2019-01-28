@@ -36,7 +36,7 @@ app:
     # When use IP access, comment hosts node
     host: store.13.78.134.10.nip.io
     annotations:
-      kubernetes.io/ingress.class: nginx
+      kubernetes.io/ingress.class: addon-http-application-routing
       #kubernetes.io/tls-acme: "true"
       #nginx.ingress.kubernetes.io/ssl-redirect: "true"
     #tls:
@@ -58,11 +58,11 @@ app:
 
   nodeSelector: {}
 
-  tolerations: {}
-  #  - key: virtual-kubelet.io/provider
-  #    operator: Exists
-  #  - key: azure.com/aci
-  #    effect: NoSchedule
+  tolerations:
+  - key: virtual-kubelet.io/provider
+    operator: Exists
+  - effect: NoSchedule
+    key: azure.com/aci
 
   affinity: {}
 

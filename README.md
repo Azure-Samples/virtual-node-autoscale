@@ -58,15 +58,6 @@ spec:
 
 ### Install
 
-```
-helm install --name vn-affinity ./charts/vn-affinity-admission-controller
-```
-
-Label the namespace you wish enable the webhook to function on
-```
-kubectl label namespace default vn-affinity-injection=enabled
-```
-
 ## Install Prometheus Operator
 
 We will use the [Prometheus Operator](https://coreos.com/operators/prometheus/docs/latest/user-guides/getting-started.html) to create the Prometheus cluster and to create the relevant configuration to monitor our app. So first, install the operator:
