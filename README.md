@@ -93,7 +93,7 @@ kubectl expose pod prometheus-prometheus-0 --port 9090 --target-port 9090
 
 ## Deploy online-store app
 
-You will need your Virtual Kubelet node name, external IP address for Ingress, and decide if you wish to use App Insights to install the online-store app. 
+You will need your Virtual Kubelet node name, external IP address for Ingress, Ingress class name, and decide if you wish to use App Insights to install the online-store app. 
 
 ### Export Virtual Kubelet node name
 The app will also install a counter that will get the pod count for the application and provide a metric for pods on Virtual Kubelet and pods on all other nodes.
@@ -115,8 +115,7 @@ Export the node name to an environment variable
 export VK_NODE_NAME=<your_node_name>
 ```
 
-### Export the ingress external IP address
-
+### Export the ingress external IP address and class annotation
 Stated in the pre-requisites, an ingress solution must exist to accept requests from the sample application. The easiest way to set this up is by installing the [HTTP application routing add-on for AKS](https://docs.microsoft.com/azure/aks/http-application-routing).
 
 This can be installed with the following add-on command.
@@ -146,18 +145,31 @@ Export this external IP to an environment variable.
 ```bash
 export INGRESS_EXTERNAL_IP=<ingress_external_ip>
 ```
+
+Next find the Ingress controller class name.
+
+```bash
+kubectl -n <ingress_controller_namespace> get po <ingress_controller_pod_name> -o yaml | grep ingress-class | sed -e 's/.*=//'
+```
+
+Export the Ingress controller class annotation.
+
+```bash
+export INGRESS_CLASS_ANNOTATION=<ingress_controller_class_annotation>
+```
+
 ### Set Application Insights on or off
 
 By default, the online store will also send data to [Application Insights](https://docs.microsoft.com/en-us/azure/application-insights/app-insights-nodejs-quick-start#enable-application-insights). Once you have created a workspace, you'll need the [`Instrumentation Key`](https://docs.microsoft.com/en-us/azure/application-insights/app-insights-nodejs-quick-start#configure-app-insights-sdk). If you'd prefer to run without Application Insights, you can skip this step.
 
 ```bash
 export APP_INSIGHT_KEY=<INSTRUMENTATION_KEY>
-helm install ./charts/online-store --name online-store --set counter.specialNodeName=$VK_NODE_NAME,app.ingress.host=store.$INGRESS_EXTERNAL_IP.nip.io,appInsight.key=$APP_INSIGHT_KEY
+helm install ./charts/online-store --name online-store --set counter.specialNodeName=$VK_NODE_NAME,app.ingress.host=store.$INGRESS_EXTERNAL_IP.nip.io,appInsight.key=$APP_INSIGHT_KEY,app.ingress.annotations."kubernetes\.io/ingress\.class"=$INGRESS_CLASS_ANNOTATION
 ```
 To run this demo **without** Application Insights, run the command:
 
 ```bash
-helm install ./charts/online-store --name online-store --set counter.specialNodeName=$VK_NODE_NAME,app.ingress.host=store.$INGRESS_EXTERNAL_IP.nip.io,appInsight.enabled=false
+helm install ./charts/online-store --name online-store --set counter.specialNodeName=$VK_NODE_NAME,app.ingress.host=store.$INGRESS_EXTERNAL_IP.nip.io,appInsight.enabled=false,app.ingress.annotations."kubernetes\.io/ingress\.class"=$INGRESS_CLASS_ANNOTATION
 ```
 
 ## Deploy the Prometheus Metric Adapter
