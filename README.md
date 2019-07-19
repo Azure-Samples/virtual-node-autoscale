@@ -1,7 +1,8 @@
 ---
 languages:
-- javascript
+- go
 page_type: sample
+description: "How to use custom metrics in combination with the Kubernetes Horizontal Pod Autoscaler to autoscale an application."
 products:
 - azure
 ---
