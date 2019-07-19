@@ -1,3 +1,11 @@
+---
+languages:
+- javascript
+page_type: sample
+products:
+- azure
+---
+
 # Virtual node Autoscale Demo
 
 This repository demonstrates how to use custom metrics in combination with the Kubernetes Horizontal Pod Autoscaler to autoscale an application. Virtual nodes let you scale quickly and easily run Kubernetes pods on Azure Container Instances where you'll pay only for the container instance runtime. 
