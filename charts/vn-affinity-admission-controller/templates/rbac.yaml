@@ -21,5 +21,4 @@ roleRef:
   kind: ClusterRole
   name: {{ template "fullname" . }}-role
   apiGroup: rbac.authorization.k8s.io
-  namespace: {{ .Release.Namespace }}
 {{- end -}}
