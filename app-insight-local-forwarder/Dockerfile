@@ -1,4 +1,4 @@
-FROM microsoft/dotnet-nightly:2.2-runtime-alpine3.8
+FROM mcr.microsoft.com/dotnet/core/runtime:2.2.2-alpine3.8
 
 RUN apk --no-cache add libc6-compat
 RUN mkdir /lf
